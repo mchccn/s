@@ -1,0 +1,20 @@
+{
+  "name": "@cursorsdottsx/s",
+  "version": "1.0.0",
+  "description": "Functional switch blocks for comparing numbers.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cursorsdottsx/s.git"
+  },
+  "keywords": [],
+  "author": "im-lonely <cursors.dev@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cursorsdottsx/s/issues"
+  },
+  "homepage": "https://github.com/cursorsdottsx/s#readme"
+}
