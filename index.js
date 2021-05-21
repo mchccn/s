@@ -1,100 +1,106 @@
-(function () {
-	globalThis.Switch = function Switch(values, cases) {
-		if (typeof values !== "object" || !values) throw new Error("Values must be an object.");
-		
-		if (typeof cases !== "object" || !cases) throw new Error("Cases must be an object.");
+(function() {
+    globalThis.Switch = function Switch(values, cases) {
+        if (typeof values !== "object" || !values) throw new Error("Values must be an object.");
 
-		const v = new Map(Object.entries(values));
-		
-		const c = new Map(Object.entries(cases).filter(([k]) => k !== "default"));
+        if (typeof cases !== "object" || !cases) throw new Error("Cases must be an object.");
 
-		if (Object.keys(cases).some((k) => typeof k !== "string")) throw new Error("Cases should be represented by strings.");
-		
-		if (Object.values(cases).some((v) => typeof v !== "function")) throw new Error("Cases should be functions.");
-		
-		if (Object.keys(values).some((k) => typeof k !== "string")) throw new Error("Value names can only be strings.");
-		
-		function parse(c) {
-			const tokens = c.split(/\s+/);
-			
-			const constraints = [];
+        const v = new Map(Object.entries(values));
 
-			const constraint = {
-				name: "",
-				comparator: "",
-				value: 0,
-			};
+        const c = new Map(Object.entries(cases).filter(([k]) => k !== "default"));
 
-			let isExpecting = "name";
+        if (Object.keys(cases).some((k) => typeof k !== "string")) throw new Error("Cases should be represented by strings.");
 
-			tokens.forEach((token) => {
-				if (isExpecting === "name") {
-					if (!v.has(token)) throw new Error("Unknown value identifier.");
+        if (Object.values(cases).some((v) => typeof v !== "function")) throw new Error("Cases should be functions.");
 
-					constraint.name = token;
+        if (Object.keys(values).some((k) => typeof k !== "string")) throw new Error("Value names can only be strings.");
 
-					return void (isExpecting = "comparator");
-				}
+        function parse(c) {
+            const tokens = c.split(/\s+/);
 
-				if (isExpecting === "comparator") {
-					if (![">", "<", ">=", "<=", "=", "!="].includes(token)) throw new Error("Unknown comparator.");
+            const constraints = [];
 
-					constraint.comparator = token;
+            const constraint = {
+                name: "",
+                comparator: "",
+                value: 0,
+            };
 
-					return void (isExpecting = "value");
-				}
+            let isExpecting = "name";
 
-				if (isExpecting === "value") {
-					if (!/^-?\d+\.?\d*$/.test(token)) throw new Error("Invalid number.");
+            tokens.forEach((token) => {
+                if (isExpecting === "name") {
+                    if (!v.has(token)) throw new Error("Unknown value identifier.");
 
-					constraint.value = parseFloat(token);
+                    constraint.name = token;
 
-					constraints.push({ ...constraint });
+                    return void(isExpecting = "comparator");
+                }
 
-					constraint.name = "";
-					constraint.comparator = "";
-					constraint.value = 0;
+                if (isExpecting === "comparator") {
+                    if (![">", "<", ">=", "<=", "=", "!="].includes(token)) throw new Error("Unknown comparator.");
 
-					return void (isExpecting = "and");
-				}
+                    constraint.comparator = token;
 
-				if (isExpecting === "and") {
-					if (token !== "&") throw new Error("Expected an '&'.");
+                    return void(isExpecting = "value");
+                }
 
-					return void (isExpecting = "name");
-				}
-			});
+                if (isExpecting === "value") {
+                    if (!/^-?\d+\.?\d*$/.test(token)) throw new Error("Invalid number.");
 
-			if (isExpecting === "name") throw new Error("Expected a value identifier.");
+                    constraint.value = parseFloat(token);
 
-			if (isExpecting === "comparator") throw new Error("Expected a comparator.");
+                    constraints.push({
+                        ...constraint
+                    });
 
-			if (isExpecting === "value") throw new Error("Expected a number.");
+                    constraint.name = "";
+                    constraint.comparator = "";
+                    constraint.value = 0;
 
-			return constraints;
-		}
+                    return void(isExpecting = "and");
+                }
 
-		const comparators = {
-			[">"]: (a, b) => a > b,
-			["<"]: (a, b) => a < b,
-			[">="]: (a, b) => a >= b,
-			["<="]: (a, b) => a <= b,
-			["="]: (a, b) => a === b,
-			["!="]: (a, b) => a !== b,
-		}
+                if (isExpecting === "and") {
+                    if (token !== "&") throw new Error("Expected an '&'.");
 
-		for (const [k, p] of [...c.entries()]) {
-			const constraints = parse(k);
+                    return void(isExpecting = "name");
+                }
+            });
 
-			const results = constraints.map(({ name, comparator, value }) => {
-				const t = v.get(name);
+            if (isExpecting === "name") throw new Error("Expected a value identifier.");
 
-				return comparators[comparator](t, value);
-			});
+            if (isExpecting === "comparator") throw new Error("Expected a comparator.");
 
-			if (results.every((r) => r)) return p();
-		}
+            if (isExpecting === "value") throw new Error("Expected a number.");
 
-		return typeof cases["default"] === "function" ? cases["default"]() : undefined;
-	}
+            return constraints;
+        }
+
+        const comparators = {
+            [">"]: (a, b) => a > b,
+            ["<"]: (a, b) => a < b,
+            [">="]: (a, b) => a >= b,
+            ["<="]: (a, b) => a <= b,
+            ["="]: (a, b) => a === b,
+            ["!="]: (a, b) => a !== b,
+        }
+
+        for (const [k, p] of [...c.entries()]) {
+            const constraints = parse(k);
+
+            const results = constraints.map(({
+                name,
+                comparator,
+                value
+            }) => {
+                const t = v.get(name);
+
+                return comparators[comparator](t, value);
+            });
+
+            if (results.every((r) => r)) return p();
+        }
+
+        return typeof cases["default"] === "function" ? cases["default"]() : undefined;
+    }
 })();
