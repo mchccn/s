@@ -1,6 +1,6 @@
 {
   "name": "@cursorsdottsx/s",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Functional switch blocks for comparing numbers.",
   "main": "index.js",
   "scripts": {
