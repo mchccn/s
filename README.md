@@ -45,29 +45,32 @@ yarn add @cursorsdottsx/s
 And also super easy to use:
 
 ```js
-require("@cursorsdottsx/s");
+import Switch from "@cursorsdottsx/s";
 ```
 
 After you import the library, it will attach a global function named `Switch` that's easy to use.
 
 `Switch(values, cases)`
 
-- `values` – An object with the values to compare.
-- `cases` – All the cases.
+-   `values` – An object with the values to compare.
+-   `cases` – All the cases.
 
 Example:
 
 ```js
 const x = 10;
 
-Switch({ x }, {
-  ["x > 5"]() {
-    console.log("Greater than 5.");
-  },
-  ["default"]() {
-    console.log("Less than 5.");
-  }
-});
+Switch(
+    { x },
+    {
+        ["x > 5"]() {
+            console.log("Greater than 5.");
+        },
+        ["default"]() {
+            console.log("Less than 5.");
+        },
+    }
+);
 ```
 
 Switch supports 6 comparators, `>`, `<`, `>=`, `<=`, `=`, and `!=`. It also supports `&` for joining two comparisons like this:
@@ -76,14 +79,17 @@ Switch supports 6 comparators, `>`, `<`, `>=`, `<=`, `=`, and `!=`. It also supp
 const x = 10;
 const y = 5;
 
-Switch({ x, y }, {
-  ["x > 5 & y > 5"]() {
-    console.log("Both greater than 5.");
-  },
-  ["default"]() {
-    console.log("One is less than 5.");
-  }
-});
+Switch(
+    { x, y },
+    {
+        ["x > 5 & y > 5"]() {
+            console.log("Both greater than 5.");
+        },
+        ["default"]() {
+            console.log("One is less than 5.");
+        },
+    }
+);
 ```
 
 The `default` case is optional, and you can have as many cases as you'd like. Only one case gets executed and its return value is `Switch`'s return value.
